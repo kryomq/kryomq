@@ -26,6 +26,10 @@ public class Message {
 		this(topic, null, reliable);
 	}
 	
+	public Message(String topic, byte[] buf) {
+		this(topic, buf, true);
+	}
+	
 	public Message(String topic, byte[] buf, boolean reliable) {
 		this.topic = topic;
 		this.buf = buf;
