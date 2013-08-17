@@ -1,4 +1,4 @@
-package kryomq;
+package org.kryomq;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package kryomq;
+package org.kryomq;
 
 public abstract class MqTest {
 	static {
