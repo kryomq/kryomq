@@ -1,13 +1,10 @@
 package org.kryomq;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.kryomq.kryonet.Connection;
 
 public class TopicRegistry<T> {
 	protected Map<String, Set<T>> registry = new ConcurrentHashMap<String, Set<T>>();

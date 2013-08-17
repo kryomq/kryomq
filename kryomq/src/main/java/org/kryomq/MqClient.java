@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kryomq.Control.Command;
 
-import org.kryomq.kryo.Kryo;
-import org.kryomq.kryo.serializers.FieldSerializer;
 import org.kryomq.kryonet.Client;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
@@ -114,6 +112,7 @@ public class MqClient extends Listener {
 				latches.countDown(Command.CONTROLLED_TOPIC);
 				log.debug("{} received controlled topic:{}", this, controlledTopic);
 				break;
+			default:
 			}
 		}
 	}

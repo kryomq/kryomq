@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.kryomq.Control.Command;
 
-import org.kryomq.kryo.Kryo;
-import org.kryomq.kryo.serializers.FieldSerializer;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
 import org.kryomq.kryonet.Listener;
@@ -131,6 +129,7 @@ public class MqServer extends Listener {
 					log.trace("{} not setting privileged origin of {} to topic {}", this, connection, c.topic);
 				}
 				break;
+			default:
 			}
 		}
 	}

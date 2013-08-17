@@ -1,12 +1,5 @@
 package org.kryomq;
 
-import java.io.ByteArrayOutputStream;
-
-import org.kryomq.kryo.Kryo;
-import org.kryomq.kryo.KryoSerializable;
-import org.kryomq.kryo.io.Input;
-import org.kryomq.kryo.io.Output;
-
 public class Message {
 	public boolean reliable;
 	public String topic;
