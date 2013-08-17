@@ -29,4 +29,15 @@
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
+	<name>KryoMQ Parent POM</name>
+	<url>https://github.com/kryomq/kryomq</url>
+	<scm>
+		<url>ssh://git@github.com/kryomq/kryomq.git</url>
+		<connection>scm:git:ssh://git@github.com/kryomq/kryomq.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/kryomq/kryomq.git</developerConnection>
+	</scm>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://dps.robindps.com:8888/</url>
+	</ciManagement>
 </project>
