@@ -16,9 +16,9 @@ public class JavaSerializerTest extends KryoTestCase {
 		TestClass test = new TestClass();
 		test.stringField = "fubar";
 		test.intField = 54321;
-		roundTrip(134, test);
-		roundTrip(134, test);
-		roundTrip(134, test);
+		roundTrip(124, test);
+		roundTrip(124, test);
+		roundTrip(124, test);
 	}
 
 	static public class TestClass implements Serializable {

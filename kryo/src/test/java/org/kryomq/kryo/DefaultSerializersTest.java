@@ -169,10 +169,10 @@ public class DefaultSerializersTest extends KryoTestCase {
 		kryo.setRegistrationRequired(false);
 		// 1 byte identifying it's a class name
 		// 1 byte for the class name id
-		// 57 bytes for the class name characters
+		// 47 bytes for the class name characters
 		// 1 byte for the reference id
 		// 1 byte for the enum value
-		roundTrip(61, TestEnum.c);
+		roundTrip(51, TestEnum.c);
 	}
 
 	public void testEnumSetSerializer () {
@@ -184,7 +184,7 @@ public class DefaultSerializersTest extends KryoTestCase {
 
 		kryo = new Kryo();
 		kryo.setRegistrationRequired(false);
-		roundTrip(89, EnumSet.of(TestEnum.a, TestEnum.c));
+		roundTrip(79, EnumSet.of(TestEnum.a, TestEnum.c));
 	}
 
 	public void testEnumSerializerWithMethods () {
@@ -195,7 +195,7 @@ public class DefaultSerializersTest extends KryoTestCase {
 
 		kryo = new Kryo();
 		kryo.setRegistrationRequired(false);
-		roundTrip(76, TestEnumWithMethods.c);
+		roundTrip(64, TestEnumWithMethods.c);
 	}
 
 	public void testCollectionsMethods () {

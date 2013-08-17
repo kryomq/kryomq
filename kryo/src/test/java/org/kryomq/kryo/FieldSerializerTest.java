@@ -90,9 +90,9 @@ public class FieldSerializerTest extends KryoTestCase {
 		test.hasStringField = new HasStringField();
 		test.child = new DefaultTypes();
 		test.child.hasStringField = new HasStringField();
-		roundTrip(195, test);
+		roundTrip(175, test);
 		test.hasStringField = null;
-		roundTrip(193, test);
+		roundTrip(173, test);
 
 		test = new DefaultTypes();
 		test.booleanField = true;
@@ -115,7 +115,7 @@ public class FieldSerializerTest extends KryoTestCase {
 		test.byteArrayField = new byte[] {2, 1, 0, -1, -2};
 
 		kryo = new Kryo();
-		roundTrip(140, test);
+		roundTrip(130, test);
 
 		C c = new C();
 		c.a = new A();
@@ -125,7 +125,7 @@ public class FieldSerializerTest extends KryoTestCase {
 		c.d = new D();
 		c.d.e = new E();
 		c.d.e.f = new F();
-		roundTrip(63, c);
+		roundTrip(53, c);
 	}
 
 	public void testReferences () {
@@ -140,12 +140,12 @@ public class FieldSerializerTest extends KryoTestCase {
 		c.d.e.f.a = c.a;
 
 		kryo = new Kryo();
-		roundTrip(63, c);
+		roundTrip(53, c);
 		C c2 = (C)object2;
 		assertTrue(c2.a == c2.d.e.f.a);
 
 		// Test reset clears unregistered class names.
-		roundTrip(63, c);
+		roundTrip(53, c);
 		c2 = (C)object2;
 		assertTrue(c2.a == c2.d.e.f.a);
 
@@ -279,15 +279,15 @@ public class FieldSerializerTest extends KryoTestCase {
 
 	public void testDefaultSerializerAnnotation () {
 		kryo = new Kryo();
-		roundTrip(82, new HasDefaultSerializerAnnotation(123));
+		roundTrip(72, new HasDefaultSerializerAnnotation(123));
 	}
 
 	public void testOptionalAnnotation () {
 		kryo = new Kryo();
-		roundTrip(72, new HasOptionalAnnotation());
+		roundTrip(60, new HasOptionalAnnotation());
 		kryo = new Kryo();
 		kryo.getContext().put("smurf", null);
-		roundTrip(73, new HasOptionalAnnotation());
+		roundTrip(61, new HasOptionalAnnotation());
 	}
 
 	public void testCyclicGrgaph () throws Exception {
