@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +16,13 @@ import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
 import org.kryomq.kryonet.Listener;
 import org.kryomq.kryonet.Server;
+import org.kryomq.util.Threads;
 
 public class MqServer extends Listener {
 	private static final Logger log = LoggerFactory.getLogger(MqServer.class);
 	
 	protected int port;
-	
+	protected ExecutorService pool;
 	protected Server server;
 
 	protected Map<Connection, String> origins = new ConcurrentHashMap<Connection, String>();
@@ -30,7 +34,7 @@ public class MqServer extends Listener {
 	
 	public MqServer(int port) {
 		this.port = port;
-			
+		pool = Executors.newCachedThreadPool(Threads.factoryNamed(this + " worker "));
 	}
 	
 	public int getPort() {
@@ -95,15 +99,31 @@ public class MqServer extends Listener {
 		}
 	}
 	
-	protected void flush(String topic) {
+	protected void flush(final String topic) {
 		if(!queues.containsKey(topic))
 			return;
-		log.trace("{} flushing message queue {}", this, topic);
-		MessageQueue mq = queues.put(topic, new MessageQueue());
-		while(mq.available()) {
-			dispatch(mq.take());
-		}
-		log.trace("{} flushed message queue {}", this, topic);
+		Runnable flushTask = new Runnable() {
+			@Override
+			public void run() {
+				String name = Thread.currentThread().getName();
+				try {
+					Thread.currentThread().setName(this + " flush task:" + topic);
+					log.trace("{} flushing message queue {}", this, topic);
+					MessageQueue mq = queues.put(topic, new MessageQueue());
+					while(mq.available()) {
+						dispatch(mq.take());
+					}
+					log.trace("{} flushed message queue {}", this, topic);
+					if(queues.get(topic).available()) {
+						log.trace("{} accumulated new queued messages to topic {} during flush, re-flushing");
+						flush(topic);
+					}
+				} finally {
+					Thread.currentThread().setName(name);
+				}
+			}
+		};
+		pool.execute(flushTask);
 	}
 	
 	@Override
@@ -129,8 +149,10 @@ public class MqServer extends Listener {
 						!c.topic.startsWith(Topics.PRIVILEGED) 
 						|| permitted(new Permission(PermissionType.SUBSCRIBE, c.topic), connection)) {
 					log.trace("{} subscribing {} to topic {}", this, connection, c.topic);
+					boolean shouldFlush = subscriptions.get(c.topic).size() == 0;
 					subscriptions.add(c.topic, connection);
-					flush(c.topic);
+					if(shouldFlush)
+						flush(c.topic);
 				} else {
 					log.trace("{} not subscribing {} to privileged topic {}", this, connection, c.topic);
 				}
