@@ -24,11 +24,11 @@ public class StatusReport {
 	}
 	
 	private StatusType type;
-	private ChatUser client;
+	private ChatClient client;
 	
 	public StatusReport() {}
 	
-	public StatusReport(StatusType type, ChatUser client) {
+	public StatusReport(StatusType type, ChatClient client) {
 		this.type = type;
 		this.client = client;
 	}
@@ -37,7 +37,7 @@ public class StatusReport {
 		return type;
 	}
 	
-	public ChatUser getClient() {
+	public ChatClient getClient() {
 		return client;
 	}
 }

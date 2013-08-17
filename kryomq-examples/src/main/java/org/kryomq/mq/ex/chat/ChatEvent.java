@@ -16,21 +16,21 @@ public class ChatEvent extends EventObject {
 	private ChatMessage message;
 	private StatusReport status;
 	
-	public ChatEvent(ChatUser source, StatusReport status) {
+	public ChatEvent(ChatClient source, StatusReport status) {
 		super(source);
 		this.type = status.getType().chatEventType();
 		this.status = status;
 	}
 	
-	public ChatEvent(ChatUser source, ChatEventType type, ChatMessage message) {
+	public ChatEvent(ChatClient source, ChatEventType type, ChatMessage message) {
 		super(source);
 		this.type = type;
 		this.message = message;
 	}
 	
 	@Override
-	public ChatUser getSource() {
-		return (ChatUser) super.getSource();
+	public ChatClient getSource() {
+		return (ChatClient) super.getSource();
 	}
 	
 	public ChatEventType getType() {

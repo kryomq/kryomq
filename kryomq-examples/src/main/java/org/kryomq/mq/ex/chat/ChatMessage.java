@@ -32,16 +32,16 @@ public class ChatMessage extends PropertyMessage {
 	public void setText(String text) {
 		setProperty(TEXT, text);
 	}
-	public ChatUser getFromUser() {
-		return (ChatUser) getProperty(FROM_USER);
+	public ChatClient getFromUser() {
+		return (ChatClient) getProperty(FROM_USER);
 	}
-	public void setFromUser(ChatUser fromUser) {
+	public void setFromUser(ChatClient fromUser) {
 		setProperty(FROM_USER, fromUser);
 	}
-	public ChatUser getToUser() {
-		return (ChatUser) getProperty(TO_USER);
+	public ChatClient getToUser() {
+		return (ChatClient) getProperty(TO_USER);
 	}
-	public void setToUser(ChatUser toUser) {
+	public void setToUser(ChatClient toUser) {
 		setProperty(TO_USER, toUser);
 	}
 	
