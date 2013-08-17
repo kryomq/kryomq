@@ -36,8 +36,8 @@ public class KryoSerialization implements Serialization {
 		kryo.register(DiscoverHost.class);
 		kryo.register(Ping.class);
 
-		input = new Input(byteBufferInputStream, 512);
-		output = new Output(byteBufferOutputStream, 512);
+		input = new Input(byteBufferInputStream, 1024);
+		output = new Output(byteBufferOutputStream, 1024);
 	}
 
 	public Kryo getKryo () {
@@ -46,14 +46,16 @@ public class KryoSerialization implements Serialization {
 
 	public synchronized void write (Connection connection, ByteBuffer buffer, Object object) {
 		byteBufferOutputStream.setByteBuffer(buffer);
-		kryo.getContext().put("connection", connection);
+		kryo.getGraphContext().put("connection", connection);
+		output.setOutputStream(byteBufferOutputStream);
 		kryo.writeClassAndObject(output, object);
 		output.flush();
 	}
 
 	public synchronized Object read (Connection connection, ByteBuffer buffer) {
 		byteBufferInputStream.setByteBuffer(buffer);
-		kryo.getContext().put("connection", connection);
+		kryo.getGraphContext().put("connection", connection);
+		input.setInputStream(byteBufferInputStream);
 		return kryo.readClassAndObject(input);
 	}
 
