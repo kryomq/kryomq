@@ -21,6 +21,11 @@ public class PropertyMessage extends Message {
 		return this;
 	}
 	
+	@Override
+	public PropertyMessage createReply() {
+		return new PropertyMessage(origin, reliable);
+	}
+	
 	public boolean hasProperty(String property) {
 		return props.containsKey(property);
 	}

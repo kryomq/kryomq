@@ -32,6 +32,10 @@ public class Message {
 		this.reliable = reliable;
 	}
 	
+	public Message createReply() {
+		return new Message(origin, reliable);
+	}
+	
 	public Message set(Kryo kryo, Object value) {
 		ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		Output output = new Output(buf);
