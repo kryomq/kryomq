@@ -3,7 +3,7 @@ package org.kryomq.kryo;
 
 import org.objenesis.instantiator.ObjectInstantiator;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 import static org.kryomq.kryo.util.Util.*;
 
 /** Describes the {@link Serializer} and class ID to use for a class.

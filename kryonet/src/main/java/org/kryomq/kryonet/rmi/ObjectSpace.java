@@ -28,7 +28,7 @@ import org.kryomq.kryonet.EndPoint;
 import org.kryomq.kryonet.FrameworkMessage;
 import org.kryomq.kryonet.Listener;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 /** Allows methods on objects to be invoked remotely over TCP. Objects are {@link #register(int, Object) registered} with an ID.
  * The remote end of connections that have been {@link #addConnection(Connection) added} are allowed to

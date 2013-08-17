@@ -77,7 +77,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 import static org.kryomq.kryo.util.Util.*;
 
 /** Maps classes to serializers so object graphs can be serialized automatically.

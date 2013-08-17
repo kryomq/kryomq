@@ -1,7 +1,7 @@
 
 package org.kryomq.kryo.serializers;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

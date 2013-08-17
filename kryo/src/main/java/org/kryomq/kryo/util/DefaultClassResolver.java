@@ -8,7 +8,7 @@ import org.kryomq.kryo.Registration;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 import static org.kryomq.kryo.util.Util.*;
 
 /** Resolves classes by ID or by fully qualified class name.

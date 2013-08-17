@@ -24,7 +24,7 @@ import org.kryomq.kryonet.FrameworkMessage.DiscoverHost;
 import org.kryomq.kryonet.FrameworkMessage.RegisterTCP;
 import org.kryomq.kryonet.FrameworkMessage.RegisterUDP;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 /** Represents a TCP and optionally a UDP connection to a {@link Server}.
  * @author Nathan Sweet <misc@n4te.com> */
@@ -131,9 +131,9 @@ public class Client extends Connection implements EndPoint {
 		close();
 		if (INFO) {
 			if (udpPort != -1)
-				info("Connecting: " + host + ":" + tcpPort + "/" + udpPort);
+				info("kryonet", "Connecting: " + host + ":" + tcpPort + "/" + udpPort);
 			else
-				info("Connecting: " + host + ":" + tcpPort);
+				info("kryonet", "Connecting: " + host + ":" + tcpPort);
 		}
 		id = -1;
 		try {

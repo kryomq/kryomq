@@ -10,7 +10,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 /** @author Nathan Sweet <misc@n4te.com> */
 class UdpConnection {

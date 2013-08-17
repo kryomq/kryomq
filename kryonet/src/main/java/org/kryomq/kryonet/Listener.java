@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 /** Used to be notified about connection events. */
 public class Listener {

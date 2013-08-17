@@ -25,7 +25,7 @@ import org.kryomq.kryo.util.Util;
 
 import com.esotericsoftware.reflectasm.FieldAccess;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 
 // BOZO - Make primitive serialization with ReflectASM configurable?
 

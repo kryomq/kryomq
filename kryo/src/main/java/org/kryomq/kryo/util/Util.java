@@ -1,7 +1,7 @@
 
 package org.kryomq.kryo.util;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 
 /** A few utility methods, mostly for private use.
  * @author Nathan Sweet <misc@n4te.com> */

@@ -11,7 +11,7 @@ import java.nio.channels.SocketChannel;
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryonet.FrameworkMessage.Ping;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 // BOZO - Layer to handle handshake state.
 

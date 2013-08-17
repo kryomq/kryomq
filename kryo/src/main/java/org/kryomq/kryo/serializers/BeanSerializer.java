@@ -19,7 +19,7 @@ import org.kryomq.kryo.io.Output;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 
 /** Serializes Java beans using bean accessor methods. Only bean properties with both a getter and setter are serialized. This
  * class is not as fast as {@link FieldSerializer} but is much faster and more efficient than Java serialization. Bytecode

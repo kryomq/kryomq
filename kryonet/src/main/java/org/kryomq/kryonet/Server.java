@@ -20,7 +20,7 @@ import org.kryomq.kryonet.FrameworkMessage.DiscoverHost;
 import org.kryomq.kryonet.FrameworkMessage.RegisterTCP;
 import org.kryomq.kryonet.FrameworkMessage.RegisterUDP;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryonet.Log.*;
 
 /** Manages TCP and optionally UDP connections from many {@link Client Clients}.
  * @author Nathan Sweet <misc@n4te.com> */

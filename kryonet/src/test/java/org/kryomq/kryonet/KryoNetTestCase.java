@@ -8,8 +8,6 @@ import java.util.TimerTask;
 
 import junit.framework.TestCase;
 
-import com.esotericsoftware.minlog.Log;
-
 abstract public class KryoNetTestCase extends TestCase {
 	static public String host = "localhost";
 	static public int tcpPort = 54555, udpPort = 54777;
@@ -20,8 +18,7 @@ abstract public class KryoNetTestCase extends TestCase {
 	boolean fail;
 
 	public KryoNetTestCase () {
-		// Log.TRACE();
-		Log.DEBUG();
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
 	}
 
 	protected void setUp () throws Exception {

@@ -8,7 +8,7 @@ import org.kryomq.kryo.io.Output;
 import org.kryomq.kryo.io.OutputChunked;
 import org.kryomq.kryo.util.ObjectMap;
 
-import static com.esotericsoftware.minlog.Log.*;
+import static org.kryomq.kryo.Log.*;
 
 /** Serializes objects using direct field assignment, with limited support for forward and backward compatibility. Fields can be
  * added or removed without invalidating previously serialized bytes. Note that changing the type of a field is not supported.
