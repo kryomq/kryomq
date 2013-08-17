@@ -4,13 +4,9 @@ public class Control {
 	public static enum Command {
 		SUBSCRIBE,
 		UNSUBSCRIBE,
-		PERSONAL_TOPIC,
-		PERSONAL_ID,
-		CONTROLLED_TOPIC,
-		PRIVILEGED_SUBSCRIBE,
-		PRIVILEGED_SET_ORIGIN,
-		CONNECTED,
-		DISCONNECTED,
+		SET_ORIGIN,
+		SET_QUEUE,
+		UNSET_QUEUE,
 	}
 	
 	public Command command;

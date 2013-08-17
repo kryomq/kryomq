@@ -20,21 +20,21 @@ public class MqClient extends Listener {
 	protected int port;
 	protected Client client;
 	
-	protected TopicRegistry<MessageListener> registry = new TopicRegistry<MessageListener>();
+	protected Registry<String, MessageListener> registry = new Registry<String, MessageListener>();
 	
-	protected class CommandLatches {
+	protected class MetaLatches {
 		private CountDownLatch[] latches;
-		public CommandLatches() {
-			latches = new CountDownLatch[Control.Command.values().length];
+		public MetaLatches() {
+			latches = new CountDownLatch[Meta.MetaType.values().length];
 			for(int i = 0; i < latches.length; i++)
 				latches[i] = new CountDownLatch(1);
 		}
 		
-		public void countDown(Control.Command command) {
+		public void countDown(Meta.MetaType command) {
 			latches[command.ordinal()].countDown();
 		}
 		
-		public void await(Control.Command command) {
+		public void await(Meta.MetaType command) {
 			try {
 				latches[command.ordinal()].await();
 			} catch(InterruptedException ie) {
@@ -43,7 +43,7 @@ public class MqClient extends Listener {
 		}
 	}
 	
-	protected CommandLatches latches = new CommandLatches();
+	protected MetaLatches latches = new MetaLatches();
 	
 	protected String personalTopic;
 	protected String controlledTopic;
@@ -70,17 +70,17 @@ public class MqClient extends Listener {
 	}
 	
 	public String getPersonalTopic() {
-		latches.await(Command.PERSONAL_TOPIC);
+		latches.await(Meta.MetaType.PERSONAL_TOPIC);
 		return personalTopic;
 	}
 	
 	public int getPersonalId() {
-		latches.await(Command.PERSONAL_ID);
+		latches.await(Meta.MetaType.ID);
 		return personalId;
 	}
 	
 	public String getControlledTopic() {
-		latches.await(Command.CONTROLLED_TOPIC);
+		latches.await(Meta.MetaType.CONTROLLED_TOPIC);
 		return controlledTopic;
 	}
 	
@@ -94,22 +94,22 @@ public class MqClient extends Listener {
 				l.messageReceived(m);
 			}
 		}
-		if(object instanceof Control) {
-			Control c = (Control) object;
-			switch(c.command) {
+		if(object instanceof Meta) {
+			Meta m = (Meta) object;
+			switch(m.type) {
 			case PERSONAL_TOPIC:
-				personalTopic = c.topic;
-				latches.countDown(Command.PERSONAL_TOPIC);
+				personalTopic = m.topic;
+				latches.countDown(Meta.MetaType.PERSONAL_TOPIC);
 				log.debug("{} received personal topic:{}", this, personalTopic);
 				break;
-			case PERSONAL_ID:
-				personalId = Integer.parseInt(c.topic);
-				latches.countDown(Command.PERSONAL_ID);
+			case ID:
+				personalId = Integer.parseInt(m.topic);
+				latches.countDown(Meta.MetaType.ID);
 				log.debug("{} received personal id:{}", this, personalId);
 				break;
 			case CONTROLLED_TOPIC:
-				controlledTopic = c.topic;
-				latches.countDown(Command.CONTROLLED_TOPIC);
+				controlledTopic = m.topic;
+				latches.countDown(Meta.MetaType.CONTROLLED_TOPIC);
 				log.debug("{} received controlled topic:{}", this, controlledTopic);
 				break;
 			default:
@@ -119,23 +119,19 @@ public class MqClient extends Listener {
 	
 	public synchronized void subscribe(String topic, MessageListener subscriber) {
 		log.debug("{} subscribing {} to topic {}", this, subscriber, topic);
-		registry.subscribe(topic, subscriber);
+		registry.add(topic, subscriber);
 		client.sendTCP(new Control(Command.SUBSCRIBE, topic));
-		if(topic.startsWith(Topics.PRIVILEGED)) {
-			log.trace("{} making privileged subscription request to topic {}", this, topic);
-			client.sendTCP(new Control(Command.PRIVILEGED_SUBSCRIBE, topic));
-		}
 	}
 	
 	public synchronized void unsubscribe(String topic, MessageListener subscriber) {
 		log.debug("{} unsubscribing {} from topic {}", this, subscriber, topic);
-		if(registry.unsubscribe(topic, subscriber).size() == 0)
+		if(registry.remove(topic, subscriber).size() == 0)
 			client.sendTCP(new Control(Command.UNSUBSCRIBE, topic));
 	}
 	
 	public void setOrigin(String topic) {
 		log.trace("{} making privileged set origin request to topic {}", this, topic);
-		client.sendTCP(new Control(Command.PRIVILEGED_SET_ORIGIN, topic));
+		client.sendTCP(new Control(Command.SET_ORIGIN, topic));
 	}
 
 	public void send(Message message) {

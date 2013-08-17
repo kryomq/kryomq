@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TopicRegistry<T> {
-	protected Map<String, Set<T>> registry = new ConcurrentHashMap<String, Set<T>>();
+public class Registry<K, T> {
+	protected Map<K, Set<T>> registry = new ConcurrentHashMap<K, Set<T>>();
 	
-	public void subscribe(String topic, T subscriber) {
+	public void add(K topic, T subscriber) {
 		synchronized(registry) {
 			if(!registry.containsKey(topic))
 				registry.put(topic, Collections.synchronizedSet(new HashSet<T>()));
@@ -18,7 +18,7 @@ public class TopicRegistry<T> {
 		subs.add(subscriber);
 	}
 	
-	public Set<T> unsubscribe(String topic, T subscriber) {
+	public Set<T> remove(K topic, T subscriber) {
 		Set<T> subs = registry.get(topic);
 		if(subs == null)
 			return Collections.emptySet();
@@ -26,11 +26,19 @@ public class TopicRegistry<T> {
 		return subs;
 	}
 	
-	public Set<T> get(String topic) {
+	public boolean has(K topic) {
+		return registry.containsKey(topic);
+	}
+	
+	public Set<T> get(K topic) {
 		Set<T> subs = registry.get(topic);
 		if(subs == null)
 			return Collections.emptySet();
 		return Collections.unmodifiableSet(subs);
+	}
+	
+	public Set<T> remove(K topic) {
+		return registry.remove(topic);
 	}
 	
 	public void deregister(T subscriber) {
@@ -40,4 +48,5 @@ public class TopicRegistry<T> {
 			}
 		}
 	}
+
 }
