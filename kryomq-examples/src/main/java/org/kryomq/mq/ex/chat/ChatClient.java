@@ -29,7 +29,7 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	private boolean away;
 	
 	private transient Map<String, ChatClient> users = new HashMap<String, ChatClient>();
-	private transient EventListenerList listenerList;
+	private transient EventListenerList listenerList = new EventListenerList();
 	
 	public ChatClient() {
 	}
@@ -49,12 +49,15 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	public void connect(String host, int port) throws IOException {
 		mq = new ChatMqClient(host, port);
 		mq.start();
+
 		personalTopic = mq.getPersonalTopic();
+		users.put(personalTopic, this);
 		
 		mq.subscribe(personalTopic, this);
 		mq.subscribe(ChatTopics.STATUS_REPORTS, this);
 		
-		users.put(personalTopic, this);
+		setNickname(getNickname());
+		setAway(isAway());
 	}
 	
 	public void disconnect() throws IOException {
@@ -140,8 +143,20 @@ public class ChatClient implements ChatClientUser, MessageListener {
 			Object content = message.get(new ChatKryo(this));
 			if(content instanceof StatusReport) {
 				StatusReport report = (StatusReport) content;
-				if(report.getType() == StatusType.SET_NICKNAME) {
-					users.get(report.getClient().getPersonalTopic()).setNickname(report.getClient().getNickname());
+				if(getPersonalTopic().equals(report.getClient().getPersonalTopic()))
+					return;
+				ChatClient localSource = users.get(report.getClient().getPersonalTopic());
+				if(localSource == null)
+					users.put(report.getClient().getPersonalTopic(), localSource = new ChatClient(ChatClient.this).withPersonalTopic(report.getClient().getPersonalTopic()));
+				switch(report.getType()) {
+				case SET_NICKNAME:
+					localSource.setNickname(report.getClient().getNickname());
+					break;
+				case AWAY:
+					localSource.setAway(true);
+					break;
+				case RETURNED:
+					localSource.setAway(false);
 				}
 				fireStatusChanged(report);
 			}
@@ -154,6 +169,8 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	
 	public void setAway(boolean away) {
 		this.away = away;
+		if(mq == null)
+			return;
 		StatusReport report = new StatusReport(away ? StatusType.AWAY : StatusType.RETURNED, this);
 		Message m = new Message(ChatTopics.STATUS_REPORTS, true);
 		m.set(new ChatKryo(this), report);
@@ -174,11 +191,22 @@ public class ChatClient implements ChatClientUser, MessageListener {
 			super.received(connection, object);
 			if(object instanceof Meta) {
 				Meta meta = (Meta) object;
+				if(getPersonalTopic().equals(meta.topic))
+					return;
 				ChatClient source = new ChatClient(ChatClient.this).withPersonalTopic(meta.topic);
 				switch(meta.type) {
 				case CONNECTED:
 					users.put(meta.topic, source);
 					fireStatusChanged(new StatusReport(StatusType.ONLINE, source));
+					// Alert the new user to our presence
+					ChatKryo kryo = new ChatKryo(ChatClient.this);
+					StatusReport status = new StatusReport(StatusType.ONLINE, ChatClient.this);
+					Message m = new Message(meta.topic, true).set(kryo, status);
+					mq.send(m);
+					if(isAway()) {
+						status = new StatusReport(StatusType.AWAY, ChatClient.this);
+						mq.send(m.set(kryo, status));
+					}
 					break;
 				case DISCONNECTED:
 					users.remove(meta.topic);
