@@ -1,5 +1,7 @@
 package org.kryomq.kryo.serializers;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +13,18 @@ import org.kryomq.kryo.io.Output;
 
 public class ChainWrapSerializer<T> extends Serializer<T> {
 	
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface Chained {
+	}
+	
 	protected Class<T> cls;
 	protected Serializer<T> wrapped;
 	protected List<Method> prewrite;
 	protected List<Method> postread;
+	
+	public ChainWrapSerializer(Class<T> cls, Kryo kryo) {
+		this(cls, kryo.getSerializer(cls));
+	}
 	
 	public ChainWrapSerializer(Class<T> cls, Serializer<T> wrapped) {
 		this.cls = cls;
@@ -29,7 +39,8 @@ public class ChainWrapSerializer<T> extends Serializer<T> {
 			try {
 				Method m = cls.getDeclaredMethod(methodName, argClasses);
 				m.setAccessible(true);
-				chain.add(0, m);
+				if(m.isAnnotationPresent(Chained.class))
+					chain.add(0, m);
 			} catch(Exception ex) {
 			}
 			cls = cls.getSuperclass();
