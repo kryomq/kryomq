@@ -15,11 +15,12 @@ public class MessageQueue {
 		kryo = new MqKryo();
 		pair = new ByteArrayStreamPair();
 		output = new Output(pair.getOutputStream());
-		input = new Input(pair.getInputStream());
+		input = new Input(pair.getInputStream(),1);
 	}
 	
 	public void put(Message message) {
 		kryo.writeObject(output, message);
+		output.flush();
 	}
 	
 	public Message take() {

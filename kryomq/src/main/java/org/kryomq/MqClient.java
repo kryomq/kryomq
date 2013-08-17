@@ -133,6 +133,14 @@ public class MqClient extends Listener {
 		log.trace("{} making privileged set origin request to topic {}", this, topic);
 		client.sendTCP(new Control(Command.SET_ORIGIN, topic));
 	}
+	
+	public void setQueue(String topic) {
+		client.sendTCP(new Control(Command.SET_QUEUE, topic));
+	}
+	
+	public void unsetQueue(String topic) {
+		client.sendTCP(new Control(Command.UNSET_QUEUE, topic));
+	}
 
 	public void send(Message message) {
 		if(message.reliable)

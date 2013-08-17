@@ -12,6 +12,8 @@ public class Meta {
 	public MetaType type;
 	public String topic;
 	
+	public Meta() {}
+	
 	public Meta(MetaType type, String topic) {
 		this.type = type;
 		this.topic = topic;

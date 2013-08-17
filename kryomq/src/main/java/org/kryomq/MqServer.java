@@ -75,6 +75,12 @@ public class MqServer extends Listener {
 		origins.remove(connection);
 	}
 	
+	protected boolean permitted(Permission perm, Connection connection) {
+		if(connection.getRemoteAddressTCP().getAddress().isLoopbackAddress())
+			return true;
+		return permissions.get(perm).contains(connection);
+	}
+	
 	protected void dispatch(Message m) {
 		log.trace("{} dispatching message from {} to {}", this, m.origin, m.topic);
 		Set<Connection> subscribers = subscriptions.get(m.topic);
@@ -98,6 +104,7 @@ public class MqServer extends Listener {
 		while(mq.available()) {
 			dispatch(mq.take());
 		}
+		log.trace("{} flushed message queue {}", this, topic);
 	}
 	
 	@Override
@@ -107,11 +114,7 @@ public class MqServer extends Listener {
 			m.origin = origins.get(connection);
 			boolean authorized = true;
 			if(m.topic.startsWith(Topics.CONTROLLED)) {
-				authorized = false;
-				if(connection.getRemoteAddressTCP().getAddress().isLoopbackAddress())
-					authorized = true;
-				else if(permissions.get(new Permission(PermissionType.SEND, m.topic)).contains(connection))
-					authorized = true;
+				authorized = permitted(new Permission(PermissionType.SEND, m.topic), connection);
 			}
 			if(!authorized) {
 				log.trace("{} dropping unauthorized message from {} to {}", this, m.origin, m.topic);
@@ -125,7 +128,7 @@ public class MqServer extends Listener {
 			case SUBSCRIBE:
 				if(
 						!c.topic.startsWith(Topics.PRIVILEGED) 
-						|| permissions.get(new Permission(PermissionType.SUBSCRIBE, c.topic)).contains(connection)) {
+						|| permitted(new Permission(PermissionType.SUBSCRIBE, c.topic), connection)) {
 					log.trace("{} subscribing {} to topic {}", this, connection, c.topic);
 					subscriptions.add(c.topic, connection);
 					flush(c.topic);
@@ -138,22 +141,24 @@ public class MqServer extends Listener {
 				subscriptions.remove(c.topic, connection);
 				break;
 			case SET_ORIGIN:
-				if(permissions.get(new Permission(PermissionType.SET_ORIGIN)).contains(connection)) {
+				if(permitted(new Permission(PermissionType.SET_ORIGIN), connection)) {
 					log.trace("{} setting origin of {} to {}", this, connection, c.topic);
 					origins.put(connection, c.topic);
 				}
+				break;
 			case SET_QUEUE:
-				if(permissions.get(new Permission(PermissionType.QUEUE)).contains(connection)) {
+				if(permitted(new Permission(PermissionType.QUEUE), connection)) {
 					log.trace("{} setting queue {}", this, c.topic);
 					if(!queues.containsKey(c.topic))
 						queues.put(c.topic, new MessageQueue());
 				}
+				break;
 			case UNSET_QUEUE:
-				if(permissions.get(new Permission(PermissionType.QUEUE)).contains(connection)) {
+				if(permitted(new Permission(PermissionType.QUEUE), connection)) {
 					log.trace("{} unsetting queue {}", this, c.topic);
 					queues.remove(c.topic);
 				}
-			default:
+				break;
 			}
 		}
 	}
