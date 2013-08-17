@@ -59,6 +59,7 @@ public class MqServer extends Listener {
 	public void connected(Connection connection) {
 		String personalTopic = Topics.PRIVILEGED + Topics.CLIENT + connection.getID();
 		String controlledTopic = Topics.CONTROLLED + Topics.CLIENT + connection.getID();
+		queues.put(personalTopic, new MessageQueue());
 		permissions.add(new Permission(PermissionType.SUBSCRIBE, personalTopic), connection);
 		permissions.add(new Permission(PermissionType.SEND, controlledTopic), connection);
 		origins.put(connection, personalTopic);
@@ -75,6 +76,7 @@ public class MqServer extends Listener {
 		subscriptions.deregister(connection);
 		permissions.deregister(connection);
 		origins.remove(connection);
+		queues.remove(personalTopic);
 	}
 	
 	protected boolean permitted(Permission perm, Connection connection) {
