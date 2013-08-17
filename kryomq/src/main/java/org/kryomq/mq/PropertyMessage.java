@@ -16,14 +16,14 @@ public class PropertyMessage extends Message {
 		super(topic, reliable);
 	}
 
-	public PropertyMessage setProperty(String property, Object value) {
-		props.put(property, value);
-		return this;
-	}
-	
 	@Override
 	public PropertyMessage createReply() {
 		return new PropertyMessage(origin, reliable);
+	}
+
+	public PropertyMessage setProperty(String property, Object value) {
+		props.put(property, value);
+		return this;
 	}
 	
 	public boolean hasProperty(String property) {
@@ -38,7 +38,7 @@ public class PropertyMessage extends Message {
 		set(kryo, props);
 	}
 	
-	private void load(Kryo kryo) {
+	public void load(Kryo kryo) {
 		props = (Map<String, Object>) get(kryo);
 	}
 }
