@@ -1,9 +1,9 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
-import org.kryomq.util.ByteArrayStreamPair;
+import org.kryomq.mq.util.ByteArrayStreamPair;
 
 public class MessageQueue {
 	protected Kryo kryo;

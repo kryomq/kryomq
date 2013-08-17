@@ -1,4 +1,4 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 import java.io.IOException;
 import java.util.Set;
@@ -6,12 +6,11 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kryomq.Control.Command;
-
 import org.kryomq.kryonet.Client;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
 import org.kryomq.kryonet.Listener;
+import org.kryomq.mq.Control.Command;
 
 public class MqClient extends Listener {
 	private static final Logger log = LoggerFactory.getLogger(MqClient.class);

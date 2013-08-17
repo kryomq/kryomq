@@ -7,10 +7,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.kryomq.Message;
-import org.kryomq.MessageListener;
-import org.kryomq.MqClient;
-import org.kryomq.MqServer;
+import org.kryomq.mq.Message;
+import org.kryomq.mq.MessageListener;
+import org.kryomq.mq.MqClient;
+import org.kryomq.mq.MqServer;
 
 public class ControlTest extends MqTest {
 	private MqServer server;

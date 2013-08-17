@@ -1,4 +1,4 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.serializers.FieldSerializer;

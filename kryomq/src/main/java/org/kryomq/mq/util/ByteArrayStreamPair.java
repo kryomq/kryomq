@@ -1,4 +1,4 @@
-package org.kryomq.util;
+package org.kryomq.mq.util;
 
 import java.io.IOException;
 import java.io.InputStream;

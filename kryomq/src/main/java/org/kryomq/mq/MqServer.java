@@ -1,4 +1,4 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 import java.io.IOException;
 import java.util.Map;
@@ -6,15 +6,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.kryomq.Meta.MetaType;
-import org.kryomq.Permission.PermissionType;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
 import org.kryomq.kryonet.Listener;
 import org.kryomq.kryonet.Server;
-import org.kryomq.util.Threads;
+import org.kryomq.mq.Meta.MetaType;
+import org.kryomq.mq.Permission.PermissionType;
+import org.kryomq.mq.util.Threads;
 
 public class MqServer extends Listener {
 	private static final Logger log = LoggerFactory.getLogger(MqServer.class);

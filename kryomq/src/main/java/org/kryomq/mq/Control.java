@@ -1,4 +1,4 @@
-package org.kryomq;
+package org.kryomq.mq;
 
 public class Control {
 	public static enum Command {

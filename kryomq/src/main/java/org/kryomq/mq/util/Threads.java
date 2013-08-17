@@ -1,4 +1,4 @@
-package org.kryomq.util;
+package org.kryomq.mq.util;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
