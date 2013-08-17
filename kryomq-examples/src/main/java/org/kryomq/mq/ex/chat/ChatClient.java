@@ -20,12 +20,13 @@ import org.kryomq.mq.MqClient;
 import org.kryomq.mq.ex.chat.ChatEvent.ChatEventType;
 import org.kryomq.mq.ex.chat.StatusReport.StatusType;
 
-public class ChatClient implements ChatUser, MessageListener {
+public class ChatClient implements ChatClientUser, MessageListener {
 	private transient MqClient mq;
 	private transient ChatClient owner;
 	
 	private String nickname;
 	private String personalTopic;
+	private boolean away;
 	
 	private transient Map<String, ChatClient> users = new HashMap<String, ChatClient>();
 	private transient EventListenerList listenerList;
@@ -42,6 +43,7 @@ public class ChatClient implements ChatUser, MessageListener {
 		Object contextOwner = kryo.getContext().get(ChatKryo.OWNER_CONTEXT_KEY);
 		if(contextOwner instanceof ChatClient)
 			this.owner = (ChatClient) contextOwner;
+		
 	}
 	
 	public void connect(String host, int port) throws IOException {
@@ -145,16 +147,21 @@ public class ChatClient implements ChatUser, MessageListener {
 			}
 		}
 	}
+
+	public boolean isAway() {
+		return away;
+	}
 	
 	public void setAway(boolean away) {
+		this.away = away;
 		StatusReport report = new StatusReport(away ? StatusType.AWAY : StatusType.RETURNED, this);
 		Message m = new Message(ChatTopics.STATUS_REPORTS, true);
 		m.set(new ChatKryo(this), report);
 		mq.send(m);
 	}
 	
-	public Map<String, ChatClient> getUsers() {
-		return users;
+	public Set<ChatUser> getUsers() {
+		return new HashSet<ChatUser>(users.values());
 	}
 
 	private class ChatMqClient extends MqClient {
