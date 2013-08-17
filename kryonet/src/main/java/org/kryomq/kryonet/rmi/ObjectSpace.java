@@ -21,6 +21,7 @@ import org.kryomq.kryo.Serializer;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
 import org.kryomq.kryo.serializers.FieldSerializer;
+import org.kryomq.kryo.serializers.ThrowableSerializer;
 import org.kryomq.kryo.util.IntMap;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.EndPoint;
@@ -593,7 +594,7 @@ public class ObjectSpace {
 
 			public Object read (Kryo kryo, Input input, Class type) {
 				int objectID = input.readInt(true);
-				Connection connection = (Connection)kryo.getContext().get("connection");
+				Connection connection = (Connection)kryo.getGraphContext().get("connection");
 				Object object = getRegisteredObject(connection, objectID);
 				if (WARN && object == null) warn("kryonet", "Unknown object ID " + objectID + " for connection: " + connection);
 				return object;

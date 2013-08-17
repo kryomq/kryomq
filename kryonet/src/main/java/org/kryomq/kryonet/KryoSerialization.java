@@ -23,8 +23,9 @@ public class KryoSerialization implements Serialization {
 
 	public KryoSerialization () {
 		this(new Kryo());
-		kryo.setReferences(false);
+		kryo.setReferences(true);
 		kryo.setRegistrationRequired(true);
+		kryo.setAutoReset(true);
 	}
 
 	public KryoSerialization (Kryo kryo) {

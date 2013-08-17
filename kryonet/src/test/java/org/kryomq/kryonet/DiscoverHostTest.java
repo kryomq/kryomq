@@ -25,7 +25,12 @@ public class DiscoverHostTest extends KryoNetTestCase {
 		// ----
 
 		Client client = new Client();
-		InetAddress host = client.discoverHost(udpPort, 2000);
+		try {
+			InetAddress host = client.discoverHost(udpPort, 2000);
+		} catch(Exception ex) {
+			stopEndPoints();
+			fail("hahaha");
+		}
 		if (host == null) {
 			stopEndPoints();
 			fail("No servers found.");

@@ -8,8 +8,8 @@ import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoNetTestCase;
 import org.kryomq.kryonet.Listener;
 import org.kryomq.kryonet.Server;
-
 import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.serializers.ThrowableSerializer;
 
 public class RmiTest extends KryoNetTestCase {
 	public void testRMI () throws IOException {
@@ -20,12 +20,12 @@ public class RmiTest extends KryoNetTestCase {
 
 		final ObjectSpace serverObjectSpace = new ObjectSpace();
 		final TestObjectImpl serverTestObject = new TestObjectImpl(4321);
-		serverObjectSpace.register((short)42, serverTestObject);
+		serverObjectSpace.register((short)12, serverTestObject);
 
 		server.addListener(new Listener() {
 			public void connected (final Connection connection) {
 				serverObjectSpace.addConnection(connection);
-				runTest(connection, 12, 1234);
+				runTest(connection, 42, 1234);
 			}
 
 			public void received (Connection connection, Object object) {
@@ -45,12 +45,12 @@ public class RmiTest extends KryoNetTestCase {
 
 		ObjectSpace clientObjectSpace = new ObjectSpace(client);
 		final TestObjectImpl clientTestObject = new TestObjectImpl(1234);
-		clientObjectSpace.register((short)12, clientTestObject);
+		clientObjectSpace.register((short)42, clientTestObject);
 
 		startEndPoint(client);
 		client.addListener(new Listener() {
 			public void connected (final Connection connection) {
-				RmiTest.runTest(connection, 42, 4321);
+				RmiTest.runTest(connection, 12, 4321);
 			}
 
 			public void received (Connection connection, Object object) {
@@ -144,10 +144,11 @@ public class RmiTest extends KryoNetTestCase {
 
 	static public void register (Kryo kryo) {
 		kryo.register(TestObject.class);
+		kryo.register(TestObjectImpl.class);
 		kryo.register(MessageWithTestObject.class);
 		kryo.register(StackTraceElement.class);
 		kryo.register(StackTraceElement[].class);
-		kryo.register(UnsupportedOperationException.class);
+		kryo.register(UnsupportedOperationException.class, new ThrowableSerializer<UnsupportedOperationException>(kryo, UnsupportedOperationException.class));
 		ObjectSpace.registerClasses(kryo);
 	}
 
