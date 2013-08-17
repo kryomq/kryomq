@@ -1,5 +1,11 @@
 package org.kryomq;
 
+import java.io.ByteArrayOutputStream;
+
+import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.io.Input;
+import org.kryomq.kryo.io.Output;
+
 public class Message {
 	public boolean reliable;
 	public String topic;
@@ -24,5 +30,18 @@ public class Message {
 		this.topic = topic;
 		this.buf = buf;
 		this.reliable = reliable;
+	}
+	
+	public Message set(Kryo kryo, Object value) {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream();
+		Output output = new Output(buf);
+		kryo.writeClassAndObject(output, value);
+		output.close();
+		this.buf = buf.toByteArray();
+		return this;
+	}
+	
+	public Object get(Kryo kryo) {
+		return kryo.readClassAndObject(new Input(buf));
 	}
 }
