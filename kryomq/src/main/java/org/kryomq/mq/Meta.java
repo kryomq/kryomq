@@ -19,7 +19,7 @@ public class Meta {
 		/**
 		 * Assign a unique privileged topic.  See {@link Topics#PRIVILEGED}.
 		 */
-		PERSONAL_TOPIC,
+		PRIVILEGED_TOPIC,
 		/**
 		 * Assign a unique controlled topic. See {@link Topics#CONTROLLED}
 		 */

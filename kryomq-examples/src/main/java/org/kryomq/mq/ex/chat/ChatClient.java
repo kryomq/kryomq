@@ -50,7 +50,7 @@ public class ChatClient implements ChatClientUser, MessageListener {
 		mq = new ChatMqClient(host, port);
 		mq.start();
 
-		personalTopic = mq.getPersonalTopic();
+		personalTopic = mq.getPrivilegedTopic();
 		users.put(personalTopic, this);
 		
 		mq.subscribe(personalTopic, this);
@@ -191,7 +191,7 @@ public class ChatClient implements ChatClientUser, MessageListener {
 			super.received(connection, object);
 			if(object instanceof Meta) {
 				Meta meta = (Meta) object;
-				if(getPersonalTopic().equals(meta.topic))
+				if(getPrivilegedTopic().equals(meta.topic))
 					return;
 				ChatClient source = new ChatClient(ChatClient.this).withPersonalTopic(meta.topic);
 				switch(meta.type) {
