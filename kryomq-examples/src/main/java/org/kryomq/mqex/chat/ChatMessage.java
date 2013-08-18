@@ -1,18 +1,33 @@
 package org.kryomq.mqex.chat;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.serializers.ChainWrapSerializer.Chained;
-import org.kryomq.mq.helper.PropertyMessage;
 
-public class ChatMessage extends PropertyMessage {
+public class ChatMessage {
 	private static final String TIMESTAMP = "timestamp";
 	private static final String TEXT = "text";
 	private static final String FROM_USER = "from-user";
 	private static final String TO_USER = "to-user";
 	
+	protected Map<String, Object> props = new HashMap<String, Object>();
+	
 	public ChatMessage() {
 	}
 
+	public Object get(String propertyName) {
+		return props.get(propertyName);
+	}
+	
+	public boolean has(String propertyName) {
+		return props.containsKey(propertyName);
+	}
+	
+	public Object put(String propertyName, Object value) {
+		return props.put(propertyName, value);
+	}
 	public Long getTimestamp() {
 		return (Long) get(TIMESTAMP);
 	}
