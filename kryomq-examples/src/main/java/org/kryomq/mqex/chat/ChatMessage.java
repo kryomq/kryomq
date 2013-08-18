@@ -1,4 +1,4 @@
-package org.kryomq.mq.ex.chat;
+package org.kryomq.mqex.chat;
 
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.serializers.ChainWrapSerializer.Chained;

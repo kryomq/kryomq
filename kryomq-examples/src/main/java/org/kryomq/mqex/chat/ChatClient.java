@@ -1,4 +1,4 @@
-package org.kryomq.mq.ex.chat;
+package org.kryomq.mqex.chat;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ import org.kryomq.mq.Message;
 import org.kryomq.mq.MessageListener;
 import org.kryomq.mq.Meta;
 import org.kryomq.mq.MqClient;
-import org.kryomq.mq.ex.chat.ChatEvent.ChatEventType;
-import org.kryomq.mq.ex.chat.StatusReport.StatusType;
+import org.kryomq.mqex.chat.ChatEvent.ChatEventType;
+import org.kryomq.mqex.chat.StatusReport.StatusType;
 
 public class ChatClient implements ChatClientUser, MessageListener {
 	private transient MqClient mq;

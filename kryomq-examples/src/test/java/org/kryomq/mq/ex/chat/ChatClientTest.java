@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kryomq.mq.MqServer;
 import org.kryomq.mq.ex.ExTest;
+import org.kryomq.mqex.chat.ChatClient;
+import org.kryomq.mqex.chat.ChatClientUser;
 
 public class ChatClientTest extends ExTest {
 	private MqServer server;

@@ -1,6 +1,6 @@
-package org.kryomq.mq.ex.chat;
+package org.kryomq.mqex.chat;
 
-import org.kryomq.mq.ex.chat.ChatEvent.ChatEventType;
+import org.kryomq.mqex.chat.ChatEvent.ChatEventType;
 
 public class StatusReport {
 	public static enum StatusType {
