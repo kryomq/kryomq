@@ -1,7 +1,9 @@
 package org.kryomq.mq;
 
 import java.io.ByteArrayOutputStream;
+
 import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.KryoSerializable;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
 
@@ -12,23 +14,23 @@ import org.kryomq.kryo.io.Output;
  * @author robin
  *
  */
-public final class Message {
+public final class Message implements KryoSerializable {
 	/**
 	 * Whether this message should be delivered reliably (TCP) or not (UDP)
 	 */
-	public boolean reliable;
+	private boolean reliable;
 	/**
 	 * The topic to which this message is destined
 	 */
-	public String topic;
+	private String topic;
 	/**
 	 * The topic from which this message originated
 	 */
-	public String origin;
+	private String origin;
 	/**
 	 * The content of this message
 	 */
-	public byte[] buf;
+	private byte[] buf;
 
 	/**
 	 * Create a blank {@link Message}
@@ -115,5 +117,41 @@ public final class Message {
 		return kryo.readClassAndObject(new Input(buf));
 	}
 
+	@Override
+	public void write(Kryo kryo, Output output) {
+		output.writeBoolean(reliable);
+		output.writeString(topic);
+		output.writeString(origin);
+		output.writeInt(buf.length, true);
+		output.write(buf);
+	}
+
+	@Override
+	public void read(Kryo kryo, Input input) {
+		reliable = input.readBoolean();
+		topic = input.readString();
+		origin = input.readString();
+		buf = new byte[input.readInt(true)];
+		input.read(buf);
+	}
+
+	public boolean reliable() {
+		return reliable;
+	}
+	public String topic() {
+		return topic;
+	}
+	public String origin() {
+		return origin;
+	}
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+	public byte[] buf() {
+		return buf;
+	}
+	public void setBuf(byte[] buf) {
+		this.buf = buf;
+	}
 
 }

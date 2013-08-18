@@ -180,20 +180,20 @@ public class MqServer extends Listener {
 	 * @param m
 	 */
 	protected void dispatch(Message m) {
-		log.trace("{} dispatching message from {} to {}", this, m.origin, m.topic);
-		Set<Connection> subscribers = subscriptions.get(m.topic);
+		log.trace("{} dispatching message from {} to {}", this, m.origin(), m.topic());
+		Set<Connection> subscribers = subscriptions.get(m.topic());
 		
 		if(subscribers.size() > 0) {
 			// dispatch if there are any subscribers
 			for(Connection c : subscribers) {
-				if(m.reliable)
+				if(m.reliable())
 					server.sendToTCP(c.getID(), m);
 				else
 					server.sendToUDP(c.getID(), m);
 			}
-		} else if(queues.containsKey(m.topic)) {
+		} else if(queues.containsKey(m.topic())) {
 			// otherwise dump the messages in the queue
-			queues.get(m.topic).put(m);
+			queues.get(m.topic()).put(m);
 		} else {
 			// drop the message
 		}
@@ -245,14 +245,14 @@ public class MqServer extends Listener {
 		if(object instanceof Message) {
 			// A user-level message
 			Message m = (Message) object;
-			m.origin = origins.get(connection); // set the origin
+			m.setOrigin(origins.get(connection)); // set the origin
 			boolean authorized = true;
-			if(m.topic.startsWith(Topics.CONTROLLED)) {
+			if(m.topic().startsWith(Topics.CONTROLLED)) {
 				// check permissions on controlled topics
-				authorized = permitted(new Permission(PermissionType.SEND, m.topic), connection);
+				authorized = permitted(new Permission(PermissionType.SEND, m.topic()), connection);
 			}
 			if(!authorized) {
-				log.trace("{} dropping unauthorized message from {} to {}", this, m.origin, m.topic);
+				log.trace("{} dropping unauthorized message from {} to {}", this, m.origin(), m.topic());
 				return;
 			}
 			dispatch(m);
@@ -260,41 +260,41 @@ public class MqServer extends Listener {
 		if(object instanceof Control) {
 			// A command from the MqClient
 			Control c = (Control) object;
-			switch(c.command) {
+			switch(c.command()) {
 			case SUBSCRIBE: // subscribe to a topic
 				if(
-						!c.topic.startsWith(Topics.PRIVILEGED) // check perms on privileged topics 
-						|| permitted(new Permission(PermissionType.SUBSCRIBE, c.topic), connection)) {
-					log.trace("{} subscribing {} to topic {}", this, connection, c.topic);
-					boolean shouldFlush = subscriptions.get(c.topic).size() == 0;
-					subscriptions.add(c.topic, connection);
+						!c.topic().startsWith(Topics.PRIVILEGED) // check perms on privileged topics 
+						|| permitted(new Permission(PermissionType.SUBSCRIBE, c.topic()), connection)) {
+					log.trace("{} subscribing {} to topic {}", this, connection, c.topic());
+					boolean shouldFlush = subscriptions.get(c.topic()).size() == 0;
+					subscriptions.add(c.topic(), connection);
 					if(shouldFlush)
-						flush(c.topic);
+						flush(c.topic());
 				} else {
-					log.trace("{} not subscribing {} to privileged topic {}", this, connection, c.topic);
+					log.trace("{} not subscribing {} to privileged topic {}", this, connection, c.topic());
 				}
 				break;
 			case UNSUBSCRIBE: // unsubscribe from a topic
-				log.trace("{} unsubscribing {} from topic {}", this, connection, c.topic);
-				subscriptions.remove(c.topic, connection);
+				log.trace("{} unsubscribing {} from topic {}", this, connection, c.topic());
+				subscriptions.remove(c.topic(), connection);
 				break;
 			case SET_ORIGIN: // set the MqClient origin topic
 				if(permitted(new Permission(PermissionType.SET_ORIGIN), connection)) { // check perms
-					log.trace("{} setting origin of {} to {}", this, connection, c.topic);
-					origins.put(connection, c.topic);
+					log.trace("{} setting origin of {} to {}", this, connection, c.topic());
+					origins.put(connection, c.topic());
 				}
 				break;
 			case SET_QUEUE: // start queueing for a topic
 				if(permitted(new Permission(PermissionType.QUEUE), connection)) { // check perms
-					log.trace("{} setting queue {}", this, c.topic);
-					if(!queues.containsKey(c.topic))
-						queues.put(c.topic, new MessageQueue());
+					log.trace("{} setting queue {}", this, c.topic());
+					if(!queues.containsKey(c.topic()))
+						queues.put(c.topic(), new MessageQueue());
 				}
 				break;
 			case UNSET_QUEUE: // stop queueing a topic
 				if(permitted(new Permission(PermissionType.QUEUE), connection)) { // check perms
-					log.trace("{} unsetting queue {}", this, c.topic);
-					queues.remove(c.topic);
+					log.trace("{} unsetting queue {}", this, c.topic());
+					queues.remove(c.topic());
 				}
 				break;
 			}

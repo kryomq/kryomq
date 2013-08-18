@@ -191,17 +191,17 @@ public class ChatClient implements ChatClientUser, MessageListener {
 			super.received(connection, object);
 			if(object instanceof Meta) {
 				Meta meta = (Meta) object;
-				if(getPrivilegedTopic().equals(meta.topic))
+				if(getPrivilegedTopic().equals(meta.topic()))
 					return;
-				ChatClient source = new ChatClient(ChatClient.this).withPersonalTopic(meta.topic);
-				switch(meta.type) {
+				ChatClient source = new ChatClient(ChatClient.this).withPersonalTopic(meta.topic());
+				switch(meta.type()) {
 				case CONNECTED:
-					users.put(meta.topic, source);
+					users.put(meta.topic(), source);
 					fireStatusChanged(new StatusReport(StatusType.ONLINE, source));
 					// Alert the new user to our presence
 					ChatKryo kryo = new ChatKryo(ChatClient.this);
 					StatusReport status = new StatusReport(StatusType.ONLINE, ChatClient.this);
-					Message m = new Message(meta.topic, true).set(kryo, status);
+					Message m = new Message(meta.topic(), true).set(kryo, status);
 					mq.send(m);
 					if(isAway()) {
 						status = new StatusReport(StatusType.AWAY, ChatClient.this);
@@ -209,7 +209,7 @@ public class ChatClient implements ChatClientUser, MessageListener {
 					}
 					break;
 				case DISCONNECTED:
-					users.remove(meta.topic);
+					users.remove(meta.topic());
 					fireStatusChanged(new StatusReport(StatusType.OFFLINE, source));
 				}
 			}

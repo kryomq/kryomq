@@ -1,11 +1,16 @@
 package org.kryomq.mq;
 
+import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.KryoSerializable;
+import org.kryomq.kryo.io.Input;
+import org.kryomq.kryo.io.Output;
+
 /**
  * A statement about the KryoMQ system made by an {@link MqServer} to an {@link MqClient}
  * @author robin
  *
  */
-public class Meta {
+public class Meta implements KryoSerializable {
 	/**
 	 * Types of KryoMQ metadata
 	 * @author robin
@@ -37,11 +42,11 @@ public class Meta {
 	/**
 	 * The metadata type
 	 */
-	public MetaType type;
+	private MetaType type;
 	/**
 	 * The metadata topic, either beign assigned or the personal topic of the {@link MqClient} in question
 	 */
-	public String topic;
+	private String topic;
 	
 	/**
 	 * required for deserialization
@@ -57,5 +62,25 @@ public class Meta {
 	public Meta(MetaType type, String topic) {
 		this.type = type;
 		this.topic = topic;
+	}
+
+	@Override
+	public void write(Kryo kryo, Output output) {
+		kryo.writeObject(output, type);
+		output.writeString(topic);
+	}
+
+	@Override
+	public void read(Kryo kryo, Input input) {
+		type = kryo.readObject(input, MetaType.class);
+		topic = input.readString();
+	}
+	
+	public MetaType type() {
+		return type;
+	}
+	
+	public String topic() {
+		return topic;
 	}
 }

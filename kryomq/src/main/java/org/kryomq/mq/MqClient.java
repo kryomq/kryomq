@@ -159,7 +159,7 @@ public class MqClient extends Listener {
 			// A user message
 			Message m = (Message) object;
 			log.trace("{} dispatching {}", this, m);
-			Set<MessageListener> subscribers = registry.get(m.topic);
+			Set<MessageListener> subscribers = registry.get(m.topic());
 			for(MessageListener l : subscribers) {
 				l.messageReceived(m);
 			}
@@ -167,19 +167,19 @@ public class MqClient extends Listener {
 		if(object instanceof Meta) {
 			// A meta directive
 			Meta m = (Meta) object;
-			switch(m.type) {
+			switch(m.type()) {
 			case PRIVILEGED_TOPIC:
-				privilegedTopic = m.topic;
+				privilegedTopic = m.topic();
 				latches.countDown(Meta.MetaType.PRIVILEGED_TOPIC);
 				log.debug("{} received personal topic:{}", this, privilegedTopic);
 				break;
 			case ID:
-				id = Integer.parseInt(m.topic);
+				id = Integer.parseInt(m.topic());
 				latches.countDown(Meta.MetaType.ID);
 				log.debug("{} received personal id:{}", this, id);
 				break;
 			case CONTROLLED_TOPIC:
-				controlledTopic = m.topic;
+				controlledTopic = m.topic();
 				latches.countDown(Meta.MetaType.CONTROLLED_TOPIC);
 				log.debug("{} received controlled topic:{}", this, controlledTopic);
 				break;
@@ -240,7 +240,7 @@ public class MqClient extends Listener {
 	 * @param message
 	 */
 	public void send(Message message) {
-		if(message.reliable)
+		if(message.reliable())
 			client.sendTCP(message);
 		else
 			client.sendUDP(message);
@@ -399,7 +399,7 @@ public class MqClient extends Listener {
 			if(closed)
 				throw new IllegalStateException();
 			Message m = new Message(topic, reliable);
-			m.buf = buf;
+			m.setBuf(buf);
 			MqClient.this.send(m);
 		}
 		
@@ -429,7 +429,7 @@ public class MqClient extends Listener {
 		public byte[] receive() {
 			if(closed)
 				throw new IllegalStateException();
-			return queue.take().buf;
+			return queue.take().buf();
 		}
 	
 		@Override

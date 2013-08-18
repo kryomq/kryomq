@@ -1,12 +1,17 @@
 package org.kryomq.mq;
 
+import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.KryoSerializable;
+import org.kryomq.kryo.io.Input;
+import org.kryomq.kryo.io.Output;
+
 /**
  * An object representing an action taken by an {@link MqClient} that must be sent
  * to the {@link MqServer}.
  * @author robin
  *
  */
-public class Control {
+public class Control implements KryoSerializable {
 	/**
 	 * The command types available to an {@link MqClient}
 	 * @author robin
@@ -38,11 +43,11 @@ public class Control {
 	/**
 	 * The command type
 	 */
-	public Command command;
+	private Command command;
 	/**
 	 * The topic the command is applied to
 	 */
-	public String topic;
+	private String topic;
 	
 	/**
 	 * required for deserialization
@@ -58,5 +63,25 @@ public class Control {
 	public Control(Command command, String topic) {
 		this.command = command;
 		this.topic = topic;
+	}
+	
+	public Command command() {
+		return command;
+	}
+	
+	public String topic() {
+		return topic;
+	}
+
+	@Override
+	public void write(Kryo kryo, Output output) {
+		kryo.writeObject(output, command);
+		output.writeString(topic);
+	}
+
+	@Override
+	public void read(Kryo kryo, Input input) {
+		command = kryo.readObject(input, Command.class);
+		topic = input.readString();
 	}
 }

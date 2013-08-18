@@ -2,12 +2,17 @@ package org.kryomq.mq;
 
 import java.util.Arrays;
 
+import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.KryoSerializable;
+import org.kryomq.kryo.io.Input;
+import org.kryomq.kryo.io.Output;
+
 /**
  * Permissions grantable for potentially privileged actions
  * @author robin
  *
  */
-public class Permission {
+public class Permission implements KryoSerializable {
 	/**
 	 * Types of permissions which can be granted
 	 * @author robin
@@ -43,11 +48,11 @@ public class Permission {
 	/**
 	 * The type of permission that is represented by this {@link Permission}
 	 */
-	public PermissionType type;
+	private PermissionType type;
 	/**
 	 * The topic to which this {@link Permission} applies
 	 */
-	public String topic;
+	private String topic;
 	
 	/**
 	 * required for deserialization
@@ -93,5 +98,25 @@ public class Permission {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void write(Kryo kryo, Output output) {
+		kryo.writeObject(output, type);
+		output.writeString(topic);
+	}
+
+	@Override
+	public void read(Kryo kryo, Input input) {
+		type = kryo.readObject(input, PermissionType.class);
+		topic = input.readString();
+	}
+	
+	public PermissionType type() {
+		return type;
+	}
+	
+	public String topic() {
+		return topic;
 	}
 }
