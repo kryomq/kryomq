@@ -2,34 +2,72 @@ package org.kryomq.mq;
 
 import java.util.Arrays;
 
+/**
+ * Permissions grantable for potentially privileged actions
+ * @author robin
+ *
+ */
 public class Permission {
+	/**
+	 * Types of permissions which can be granted
+	 * @author robin
+	 *
+	 */
 	public static enum PermissionType {
-		SET_ORIGIN("origin"),
-		SUBSCRIBE("subscribe"),
-		QUEUE("queue"),
-		SEND("send"),
-		GRANT("grant"),
-		REVOKE("revoke"),
-		;
-		
-		private String topic;
-		
-		private PermissionType(String topic) {
-			this.topic = topic;
-		}
-		
-		public String getTopic() {
-			return topic;
-		}
+		/**
+		 * Permission to set your {@link MqClient} origin
+		 */
+		SET_ORIGIN,
+		/**
+		 * Permission to subscribe to a topic
+		 */
+		SUBSCRIBE,
+		/**
+		 * Permission to control queueing of a topic
+		 */
+		QUEUE,
+		/**
+		 * Permission to send to a topic
+		 */
+		SEND,
+		/**
+		 * Permission to grant permission
+		 */
+		GRANT,
+		/**
+		 * Permission to revoke permission
+		 */
+		REVOKE,
 	}
 	
+	/**
+	 * The type of permission that is represented by this {@link Permission}
+	 */
 	public PermissionType type;
+	/**
+	 * The topic to which this {@link Permission} applies
+	 */
 	public String topic;
 	
+	/**
+	 * required for deserialization
+	 */
+	@Deprecated
+	public Permission() {}
+	
+	/**
+	 * Create a {@link Permission} for a non-topical {@link PermissionType}
+	 * @param type
+	 */
 	public Permission(PermissionType type) {
 		this(type, null);
 	}
 	
+	/**
+	 * Create a {@link Permission} for a topical {@link PermissionType}
+	 * @param type
+	 * @param topic
+	 */
 	public Permission(PermissionType type, String topic) {
 		this.type = type;
 		this.topic = topic;

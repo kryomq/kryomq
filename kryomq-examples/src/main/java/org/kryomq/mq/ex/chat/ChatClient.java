@@ -119,11 +119,12 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	}
 	
 	public void sendTo(ChatClient user, String text) {
-		ChatMessage m = new ChatMessage(user.getPersonalTopic());
-		m.setText(text);
-		m.setTimestamp(System.currentTimeMillis());
-		m.setFromUser(this);
-		m.setToUser(user);
+		ChatMessage chatMessage = new ChatMessage(user.getPersonalTopic());
+		chatMessage.setText(text);
+		chatMessage.setTimestamp(System.currentTimeMillis());
+		chatMessage.setFromUser(this);
+		chatMessage.setToUser(user);
+		Message m = new Message(user.getPersonalTopic(), true).set(new ChatKryo(this), chatMessage);
 		mq.send(m);
 	}
 	
@@ -137,29 +138,28 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	}
 
 	public void messageReceived(Message message) {
-		if(message instanceof ChatMessage) {
-			fireMessageReceived((ChatMessage) message);
-		} else {
-			Object content = message.get(new ChatKryo(this));
-			if(content instanceof StatusReport) {
-				StatusReport report = (StatusReport) content;
-				if(getPersonalTopic().equals(report.getClient().getPersonalTopic()))
-					return;
-				ChatClient localSource = users.get(report.getClient().getPersonalTopic());
-				if(localSource == null)
-					users.put(report.getClient().getPersonalTopic(), localSource = new ChatClient(ChatClient.this).withPersonalTopic(report.getClient().getPersonalTopic()));
-				switch(report.getType()) {
-				case SET_NICKNAME:
-					localSource.setNickname(report.getClient().getNickname());
-					break;
-				case AWAY:
-					localSource.setAway(true);
-					break;
-				case RETURNED:
-					localSource.setAway(false);
-				}
-				fireStatusChanged(report);
+		Object content = message.get(new ChatKryo(this));
+		if(content instanceof ChatMessage) {
+			fireMessageReceived((ChatMessage) content);
+		}
+		if(content instanceof StatusReport) {
+			StatusReport report = (StatusReport) content;
+			if(getPersonalTopic().equals(report.getClient().getPersonalTopic()))
+				return;
+			ChatClient localSource = users.get(report.getClient().getPersonalTopic());
+			if(localSource == null)
+				users.put(report.getClient().getPersonalTopic(), localSource = new ChatClient(ChatClient.this).withPersonalTopic(report.getClient().getPersonalTopic()));
+			switch(report.getType()) {
+			case SET_NICKNAME:
+				localSource.setNickname(report.getClient().getNickname());
+				break;
+			case AWAY:
+				localSource.setAway(true);
+				break;
+			case RETURNED:
+				localSource.setAway(false);
 			}
+			fireStatusChanged(report);
 		}
 	}
 

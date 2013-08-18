@@ -15,12 +15,16 @@ public class ChatKryo extends Kryo {
 		
 		setDefaultSerializer(FieldSerializer.class);
 		
-		Serializer<ChatClient> ccs = new FieldSerializer<ChatClient>(this, ChatClient.class);
-		register(ChatClient.class, new ChainWrapSerializer<ChatClient>(ChatClient.class, ccs));
-		
 		register(StatusReport.class);
 		register(StatusReport.StatusType.class);
 		
+		chained(ChatClient.class);
+		chained(ChatMessage.class);
+		
 		getContext().put(OWNER_CONTEXT_KEY, owner);
+	}
+	
+	protected <T> void chained(Class<T> cls) {
+		register(cls, new ChainWrapSerializer<T>(cls, new FieldSerializer<T>(this, cls)));
 	}
 }

@@ -1,5 +1,7 @@
 package org.kryomq.mq.ex.chat;
 
+import org.kryomq.kryo.Kryo;
+import org.kryomq.kryo.serializers.ChainWrapSerializer.Chained;
 import org.kryomq.mq.PropertyMessage;
 
 public class ChatMessage extends PropertyMessage {
@@ -13,6 +15,16 @@ public class ChatMessage extends PropertyMessage {
 
 	public ChatMessage(String topic) {
 		super(topic, true);
+	}
+	
+	@Chained
+	private void prewrite(Kryo kryo) {
+		store(kryo);
+	}
+	
+	@Chained
+	private void postread(Kryo kryo) {
+		load(kryo);
 	}
 	
 	@Override

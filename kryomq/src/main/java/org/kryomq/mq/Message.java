@@ -1,55 +1,52 @@
 package org.kryomq.mq;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
 
-public class Message {
-	public boolean reliable;
-	public String topic;
-	public String origin;
-	public byte[] buf;
+/**
+ * A message to be transported by KryoMQ.
+ * @author robin
+ *
+ */
+public final class Message extends BufferMessage {
 
-	public Message() {}
-	
-	public Message(byte[] buf) {
-		this(buf, true);
+	/**
+	 * Create a blank {@link Message}
+	 */
+	public Message() {
 	}
 
-	public Message(byte[] buf, boolean reliable) {
-		this(null, buf, reliable);
-	}
-	
+	/**
+	 * Create an empty {@link Message} with the argument destination and reliability
+	 * @param topic
+	 * @param reliable
+	 */
 	public Message(String topic, boolean reliable) {
-		this(topic, null, reliable);
+		super(topic, reliable);
 	}
-	
-	public Message(String topic, byte[] buf) {
-		this(topic, buf, true);
-	}
-	
+
+	/**
+	 * Create a {@link Message} with the argument destination, buffer, and reliability
+	 * @param topic
+	 * @param buf
+	 * @param reliable
+	 */
 	public Message(String topic, byte[] buf, boolean reliable) {
-		this.topic = topic;
-		this.buf = buf;
-		this.reliable = reliable;
+		super(topic, buf, reliable);
 	}
-	
+
+	@Override
 	public Message createReply() {
 		return new Message(origin, reliable);
 	}
 	
+	@Override
 	public Message set(Kryo kryo, Object value) {
-		ByteArrayOutputStream buf = new ByteArrayOutputStream();
-		Output output = new Output(buf);
-		kryo.writeClassAndObject(output, value);
-		output.close();
-		this.buf = buf.toByteArray();
-		return this;
-	}
-	
-	public Object get(Kryo kryo) {
-		return kryo.readClassAndObject(new Input(buf));
+		return (Message) super.set(kryo, value);
 	}
 }
