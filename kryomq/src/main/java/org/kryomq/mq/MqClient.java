@@ -265,8 +265,8 @@ public class MqClient extends Listener {
 	 * @param reliable
 	 * @return
 	 */
-	public <T> Sender<T> createSender(Kryo kryo, String topic, boolean reliable) {
-		return new KryoSender<T>(topic, kryo, reliable);
+	public <T> Sender<T> createSender(Class<T> cls, Kryo kryo, String topic, boolean reliable) {
+		return new KryoSender<T>(cls, topic, kryo, reliable);
 	}
 	
 	/**
@@ -276,8 +276,8 @@ public class MqClient extends Listener {
 	 * @param topic
 	 * @return
 	 */
-	public <T> Receiver<T> createReceiver(Kryo kryo, String topic) {
-		return new KryoReceiver<T>(kryo, topic);
+	public <T> Receiver<T> createReceiver(Class<T> cls, Kryo kryo, String topic) {
+		return new KryoReceiver<T>(cls, kryo, topic);
 	}
 	
 	/**
@@ -300,10 +300,12 @@ public class MqClient extends Listener {
 		private boolean closed = false;
 		private MessageQueue queue = new MessageQueue();
 	
+		private final Class<T> cls;
 		private final String topic;
 		private final Kryo kryo;
 		
-		public KryoReceiver(Kryo kryo, String topic) {
+		public KryoReceiver(Class<T> cls, Kryo kryo, String topic) {
+			this.cls = cls;
 			this.kryo = kryo;
 			this.topic = topic;
 			subscribe(topic, this);
@@ -313,7 +315,11 @@ public class MqClient extends Listener {
 		public T receive() {
 			if(closed)
 				throw new IllegalStateException();
-			return (T) queue.take().get(kryo);
+			Object r = null;
+			while(!cls.isInstance(r)) {
+				r = queue.take().get(kryo);
+			}
+			return cls.cast(r);
 		}
 	
 		@Override
@@ -340,12 +346,14 @@ public class MqClient extends Listener {
 	 * @param <T>
 	 */
 	private class KryoSender<T> implements Sender<T> {
+		private final Class<T> cls;
 		private final String topic;
 		private final Kryo kryo;
 		private final boolean reliable;
 		private boolean closed = false;
 	
-		private KryoSender(String topic, Kryo kryo, boolean reliable) {
+		private KryoSender(Class<T> cls, String topic, Kryo kryo, boolean reliable) {
+			this.cls = cls;
 			this.topic = topic;
 			this.kryo = kryo;
 			this.reliable = reliable;
@@ -355,7 +363,10 @@ public class MqClient extends Listener {
 		public void send(T object) {
 			if(closed)
 				throw new IllegalStateException();
+			if(!cls.isInstance(object))
+				return;
 			Message m = new Message(topic, reliable).set(kryo, object);
+			MqClient.this.send(m);
 		}
 	
 		@Override
