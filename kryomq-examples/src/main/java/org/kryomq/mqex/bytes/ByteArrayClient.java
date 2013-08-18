@@ -2,8 +2,8 @@ package org.kryomq.mqex.bytes;
 
 import java.io.IOException;
 
-import org.kryomq.mq.ByteArrayReceiver;
-import org.kryomq.mq.ByteArraySender;
+import org.kryomq.mq.Receiver;
+import org.kryomq.mq.Sender;
 import org.kryomq.mq.MqClient;
 
 public class ByteArrayClient {
@@ -18,11 +18,11 @@ public class ByteArrayClient {
 		client.stop();
 	}
 	
-	public ByteArraySender sender(String topic) {
+	public Sender<byte[]> sender(String topic) {
 		return client.createSender(topic, true);
 	}
 	
-	public ByteArrayReceiver receiver(String topic) {
+	public Receiver<byte[]> receiver(String topic) {
 		return client.createReceiver(topic);
 	}
 

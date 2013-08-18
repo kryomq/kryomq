@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.kryomq.kryo.Kryo;
 import org.kryomq.kryonet.Client;
 import org.kryomq.kryonet.Connection;
 import org.kryomq.kryonet.KryoSerialization;
@@ -252,8 +253,31 @@ public class MqClient extends Listener {
 	 * @param reliable
 	 * @return
 	 */
-	public ByteArraySender createSender(final String topic, final boolean reliable) {
-		return new MqClientSender(topic, reliable);
+	public Sender<byte[]> createSender(String topic, boolean reliable) {
+		return new BytesSender(topic, reliable);
+	}
+	
+	/**
+	 * Create a generic sender for an arbitrary object type.
+	 * Uses {@link Kryo} to convert to {@code byte[]}
+	 * @param kryo
+	 * @param topic
+	 * @param reliable
+	 * @return
+	 */
+	public <T> Sender<T> createSender(Kryo kryo, String topic, boolean reliable) {
+		return new KryoSender<T>(topic, kryo, reliable);
+	}
+	
+	/**
+	 * Create a generic receiver for an arbitrary object type.
+	 * Uses {@link Kryo} to convert from {@code byte[]}
+	 * @param kryo
+	 * @param topic
+	 * @return
+	 */
+	public <T> Receiver<T> createReceiver(Kryo kryo, String topic) {
+		return new KryoReceiver<T>(kryo, topic);
 	}
 	
 	/**
@@ -262,8 +286,82 @@ public class MqClient extends Listener {
 	 * @param topic
 	 * @return
 	 */
-	public ByteArrayReceiver createReceiver(String topic) {
-		return new MqClientReceiver(topic);
+	public Receiver<byte[]> createReceiver(String topic) {
+		return new BytesReceiver(topic);
+	}
+
+	/**
+	 * {@link Kryo}-backed {@link Receiver}
+	 * @author robin
+	 *
+	 * @param <T>
+	 */
+	private class KryoReceiver<T> implements Receiver<T>, MessageListener {
+		private boolean closed = false;
+		private MessageQueue queue = new MessageQueue();
+	
+		private final String topic;
+		private final Kryo kryo;
+		
+		public KryoReceiver(Kryo kryo, String topic) {
+			this.kryo = kryo;
+			this.topic = topic;
+			subscribe(topic, this);
+		}
+		
+		@Override
+		public T receive() {
+			if(closed)
+				throw new IllegalStateException();
+			return (T) queue.take().get(kryo);
+		}
+	
+		@Override
+		public boolean available() {
+			return queue.available();
+		}
+	
+		@Override
+		public void close() {
+			closed = true;
+			unsubscribe(topic, this);
+		}
+
+		@Override
+		public void messageReceived(Message message) {
+			queue.put(message);
+		}
+	}
+
+	/**
+	 * {@link Kryo}-backed {@link Sender}
+	 * @author robin
+	 *
+	 * @param <T>
+	 */
+	private class KryoSender<T> implements Sender<T> {
+		private final String topic;
+		private final Kryo kryo;
+		private final boolean reliable;
+		private boolean closed = false;
+	
+		private KryoSender(String topic, Kryo kryo, boolean reliable) {
+			this.topic = topic;
+			this.kryo = kryo;
+			this.reliable = reliable;
+		}
+	
+		@Override
+		public void send(T object) {
+			if(closed)
+				throw new IllegalStateException();
+			Message m = new Message(topic, reliable).set(kryo, object);
+		}
+	
+		@Override
+		public void close() {
+			closed = true;
+		}
 	}
 
 	/**
@@ -271,12 +369,12 @@ public class MqClient extends Listener {
 	 * @author robin
 	 *
 	 */
-	private class MqClientSender implements ByteArraySender {
+	private class BytesSender implements Sender<byte[]> {
 		private final String topic;
 		private final boolean reliable;
 		private boolean closed = false;
 	
-		private MqClientSender(String topic, boolean reliable) {
+		private BytesSender(String topic, boolean reliable) {
 			this.topic = topic;
 			this.reliable = reliable;
 		}
@@ -301,13 +399,13 @@ public class MqClient extends Listener {
 	 * @author robin
 	 *
 	 */
-	private class MqClientReceiver implements ByteArrayReceiver, MessageListener {
+	private class BytesReceiver implements Receiver<byte[]>, MessageListener {
 		private final String topic;
 		
 		private boolean closed = false;
 		private MessageQueue queue = new MessageQueue();
 		
-		public MqClientReceiver(String topic) {
+		public BytesReceiver(String topic) {
 			this.topic = topic;
 			subscribe(topic, this);
 		}
