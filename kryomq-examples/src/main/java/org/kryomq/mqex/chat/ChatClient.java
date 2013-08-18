@@ -119,7 +119,7 @@ public class ChatClient implements ChatClientUser, MessageListener {
 	}
 	
 	public void sendTo(ChatClient user, String text) {
-		ChatMessage chatMessage = new ChatMessage(user.getPersonalTopic());
+		ChatMessage chatMessage = new ChatMessage();
 		chatMessage.setText(text);
 		chatMessage.setTimestamp(System.currentTimeMillis());
 		chatMessage.setFromUser(this);

@@ -2,7 +2,7 @@ package org.kryomq.mqex.chat;
 
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.serializers.ChainWrapSerializer.Chained;
-import org.kryomq.mq.PropertyMessage;
+import org.kryomq.mq.helper.PropertyMessage;
 
 public class ChatMessage extends PropertyMessage {
 	private static final String TIMESTAMP = "timestamp";
@@ -13,51 +13,32 @@ public class ChatMessage extends PropertyMessage {
 	public ChatMessage() {
 	}
 
-	public ChatMessage(String topic) {
-		super(topic, true);
-	}
-	
-	@Chained
-	private void prewrite(Kryo kryo) {
-		store(kryo);
-	}
-	
-	@Chained
-	private void postread(Kryo kryo) {
-		load(kryo);
-	}
-	
-	@Override
-	public PropertyMessage createReply() {
-		return new ChatMessage(origin);
-	}
-	
 	public Long getTimestamp() {
-		return (Long) getProperty(TIMESTAMP);
+		return (Long) get(TIMESTAMP);
 	}
 	public void setTimestamp(Long timestamp) {
-		setProperty(TIMESTAMP, timestamp);
+		put(TIMESTAMP, timestamp);
 	}
 	public String getText() {
-		return (String) getProperty(TIMESTAMP);
+		return (String) get(TIMESTAMP);
 	}
 	public void setText(String text) {
-		setProperty(TEXT, text);
+		put(TEXT, text);
 	}
 	public ChatClient getFromUser() {
-		return (ChatClient) getProperty(FROM_USER);
+		return (ChatClient) get(FROM_USER);
 	}
 	public void setFromUser(ChatClient fromUser) {
-		setProperty(FROM_USER, fromUser);
+		put(FROM_USER, fromUser);
 	}
 	public ChatClient getToUser() {
-		return (ChatClient) getProperty(TO_USER);
+		return (ChatClient) get(TO_USER);
 	}
 	public void setToUser(ChatClient toUser) {
-		setProperty(TO_USER, toUser);
+		put(TO_USER, toUser);
 	}
 	
 	public void reply(String text) {
-		getToUser().sendTo(getFromUser(), text);
+		getFromUser().send(text);
 	}
 }
