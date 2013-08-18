@@ -1,10 +1,10 @@
-package org.kryomq.mq.util;
+package org.kryomq.mq;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ByteArrayStreamPair {
+class ByteArrayStreamPair {
 	protected byte[] buffer;
 	
 	protected long start;

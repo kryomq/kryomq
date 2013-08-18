@@ -15,7 +15,6 @@ import org.kryomq.kryonet.Listener;
 import org.kryomq.kryonet.Server;
 import org.kryomq.mq.Meta.MetaType;
 import org.kryomq.mq.Permission.PermissionType;
-import org.kryomq.mq.util.Threads;
 
 /**
  * A KryoMQ server

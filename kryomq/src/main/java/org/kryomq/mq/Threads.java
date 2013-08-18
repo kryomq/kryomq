@@ -1,9 +1,9 @@
-package org.kryomq.mq.util;
+package org.kryomq.mq;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Threads {
+class Threads {
 	public static ThreadFactory factoryNamed(final String prefix) {
 		return new ThreadFactory() {
 			private AtomicInteger count = new AtomicInteger();

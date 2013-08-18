@@ -3,7 +3,6 @@ package org.kryomq.mq;
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
-import org.kryomq.mq.util.ByteArrayStreamPair;
 
 /**
  * A byte-array backed queue for {@link Message} objects
