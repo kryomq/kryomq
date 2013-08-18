@@ -243,4 +243,95 @@ public class MqClient extends Listener {
 		else
 			client.sendUDP(message);
 	}
+	
+	/**
+	 * Create and return a new {@link ByteArraySender} that publishes to
+	 * the argument topic and reliability
+	 * @param topic
+	 * @param reliable
+	 * @return
+	 */
+	public ByteArraySender createSender(final String topic, final boolean reliable) {
+		return new MqClientSender(topic, reliable);
+	}
+	
+	/**
+	 * Create and return a new {@link ByteArrayReceiver} that listens to
+	 * the argument topic
+	 * @param topic
+	 * @return
+	 */
+	public ByteArrayReceiver createReceiver(String topic) {
+		return new MqClientReceiver(topic);
+	}
+
+	/**
+	 * {@link ByteArraySender} that sends to a single topic with optional reliability
+	 * @author robin
+	 *
+	 */
+	private class MqClientSender implements ByteArraySender {
+		private final String topic;
+		private final boolean reliable;
+		private boolean closed = false;
+	
+		private MqClientSender(String topic, boolean reliable) {
+			this.topic = topic;
+			this.reliable = reliable;
+		}
+	
+		@Override
+		public void send(byte[] buf) {
+			if(closed)
+				throw new IllegalStateException();
+			Message m = new Message(topic, reliable);
+			m.buf = buf;
+			MqClient.this.send(m);
+		}
+		
+		@Override
+		public void close() {
+			closed = true;
+		}
+	}
+
+	/**
+	 * {@link ByteArrayReceiver} taht listens to a single topic
+	 * @author robin
+	 *
+	 */
+	private class MqClientReceiver implements ByteArrayReceiver, MessageListener {
+		private final String topic;
+		
+		private boolean closed = false;
+		private MessageQueue queue = new MessageQueue();
+		
+		public MqClientReceiver(String topic) {
+			this.topic = topic;
+			subscribe(topic, this);
+		}
+		
+		@Override
+		public byte[] receive() {
+			if(closed)
+				throw new IllegalStateException();
+			return queue.take().buf;
+		}
+	
+		@Override
+		public boolean available() {
+			return queue.available();
+		}
+		
+		@Override
+		public void close() {
+			closed = true;
+			unsubscribe(topic, this);
+		}
+
+		@Override
+		public void messageReceived(Message message) {
+			queue.put(message);
+		}
+	}
 }

@@ -1,9 +1,6 @@
 package org.kryomq.mq;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.kryomq.kryo.Kryo;
 import org.kryomq.kryo.io.Input;
 import org.kryomq.kryo.io.Output;
