@@ -79,13 +79,14 @@ public class MqServer extends Listener {
 	 * and binding it to the appropriate port
 	 * @throws IOException
 	 */
-	public void start() throws IOException {
+	public MqServer start() throws IOException {
 		log.debug("{} starting server on port {}", this, port);
 		server = new Server(1024*256, 1024*256, new KryoSerialization(new MqKryo()));
 		server.start();
 		server.bind(port, port);
 		server.addListener(this);
 		log.debug("{} started server on port {}", this, port);
+		return this;
 	}
 	
 	/**

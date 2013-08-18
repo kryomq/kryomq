@@ -99,13 +99,14 @@ public class MqClient extends Listener {
 	 * Connect to the {@link MqServer}
 	 * @throws IOException
 	 */
-	public void start() throws IOException {
+	public MqClient start() throws IOException {
 		log.debug("{} connecting to {}:{}", this, host, port);
 		client = new Client(256*1024, 256*1024, new KryoSerialization(new MqKryo()));
 		client.start();
 		client.connect(10000, host, port, port);
 		client.addListener(this);
 		log.debug("{} connected and registered", this);
+		return this;
 	}
 	
 	/**
