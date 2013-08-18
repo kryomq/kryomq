@@ -259,7 +259,9 @@ public class MqClient extends Listener {
 	
 	/**
 	 * Create a generic sender for an arbitrary object type.
-	 * Uses {@link Kryo} to convert to {@code byte[]}
+	 * Uses {@link Kryo} to convert to {@code byte[]}.
+	 * If you violate type-safety and pass a non-{@code T} into {@link Sender#send(Object)}
+	 * returned by this method, the object will be silently dropped instead of sent.
 	 * @param kryo
 	 * @param topic
 	 * @param reliable
@@ -271,7 +273,9 @@ public class MqClient extends Listener {
 	
 	/**
 	 * Create a generic receiver for an arbitrary object type.
-	 * Uses {@link Kryo} to convert from {@code byte[]}
+	 * Uses {@link Kryo} to convert from {@code byte[]}.
+	 * If a message is received that decodes to a class not assignable to {@code T} then
+	 * that message is dropped silently instead of throwing exceptions.
 	 * @param kryo
 	 * @param topic
 	 * @return
